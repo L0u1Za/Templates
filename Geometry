@@ -49,10 +49,18 @@ struct point {
 const point pt_base = { 0.0, 0.0 };
 
 struct seg {
-	point end, start;
-	seg(point end = pt_base, point start = pt_base) {
+	point start, end;
+	seg(point start = pt_base, point end = pt_base) {
 		this->end = end;
 		this->start = start;
+	}
+};
+
+struct luch {
+	point start, v;
+	luch(point start = pt_base, point v = pt_base) {
+		this->start = start;
+		this->v = v;
 	}
 };
 
@@ -80,8 +88,8 @@ bool cmp_more(ld a, ld b) { // a > b
 bool cmp_less(ld a, ld b) { // a < b
 	return b - a > eps;
 }
-ld len(point a, point b) {
-	return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+ld len(point a) {
+	return a.x * a.x + a.y * a.y;
 }
 ld dist(point a, point b) {
 	return len(a - b);
@@ -91,7 +99,10 @@ bool is_in_seg(point a, seg b) {
 	if (a == b.start || a == b.end) return true;
 	return is_equal((a - b.start) * (b.end - b.start), 0.0) && cmp_less((b.end - a) ^ (b.start - a), 0.0);
 }
-
+bool is_in_luch(point a, luch b) {
+	if (a == b.start) return true;
+	return is_equal((a - b.start) * (b.v - b.start), 0.0) && cmp_more(((b.v - b.start) ^ (a - b.start)), 0.0);
+}
 
 
 signed main() {
@@ -103,10 +114,7 @@ signed main() {
 	ios_base::sync_with_stdio(0);
 	cin.tie(0); cout.tie(0);
 
-	point p; seg a;
-	cin >> p.x >> p.y >> a.start.x >> a.start.y >> a.end.x >> a.end.y;
-	bool ok = is_in_seg(p, a);
-	cout << (ok ? "YES" : "NO");
+	
 
 	return 0;
 }
