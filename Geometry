@@ -45,6 +45,7 @@ struct point {
 		this->y = y;
 	}
 };
+
 const point pt_base = { 0.0, 0.0 };
 
 struct seg {
@@ -78,6 +79,12 @@ bool cmp_more(ld a, ld b) { // a > b
 }
 bool cmp_less(ld a, ld b) { // a < b
 	return b - a > eps;
+}
+ld len(point a, point b) {
+	return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+}
+ld dist(point a, point b) {
+	return len(a - b);
 }
 
 bool is_in_seg(point a, seg b) {
