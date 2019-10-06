@@ -1,0 +1,105 @@
+#define _CRT_SECURE_NO_WARNINGS
+#define pb push_back
+
+#include <iostream>
+#include <climits>
+#include <algorithm>
+#include <iomanip>
+#include <cmath>
+#include <vector>
+#include <map>
+#include <string>
+#include <stack>
+#include <set>
+#include <cstdio>
+#include <cctype>
+#include <queue>
+#include <bitset>
+#include <functional>
+#include <cassert>
+#include <unordered_map>
+
+using namespace std;
+
+#define int long long
+
+typedef long long ll;
+typedef unsigned long long ull;
+typedef pair<ll, ll> pll;
+typedef pair<int, int> pii;
+typedef long double ld;
+typedef double db;
+
+const ll N = 1e5 + 20;
+const ll INF = LONG_MAX;
+
+
+const ld eps = 1e-15;
+const ld base = 0.0;
+
+
+struct point {
+	ld x, y;
+	point(ld x = base, ld y = base) {
+		this->x = x;
+		this->y = y;
+	}
+};
+const point pt_base = { 0.0, 0.0 };
+
+struct seg {
+	point end, start;
+	seg(point end = pt_base, point start = pt_base) {
+		this->end = end;
+		this->start = start;
+	}
+};
+
+point operator+(point a, point b) {
+	return { a.x + b.x, a.y + b.y };
+}
+point operator-(point a, point b) {
+	return { a.x - b.x, a.y - b.y };
+}
+ld operator*(point a, point b) {
+	return a.x * b.y - a.y * b.x;
+}
+ld operator^(point a, point b) {
+	return a.x * b.x + a.y * b.y;
+}
+bool is_equal(ld a, ld b) {
+	return fabs(a - b) < eps;
+}
+bool operator==(point a, point b) {
+	return is_equal(a.x, b.x) && is_equal(a.y, b.y);
+}
+bool cmp_more(ld a, ld b) { // a > b
+	return a - b > eps;
+}
+bool cmp_less(ld a, ld b) { // a < b
+	return b - a > eps;
+}
+
+bool is_in_seg(point a, seg b) {
+	if (a == b.start || a == b.end) return true;
+	return is_equal((a - b.start) * (b.end - b.start), 0.0) && cmp_less((b.end - a) ^ (b.start - a), 0.0);
+}
+
+
+
+signed main() {
+#ifndef ONLINE_JUDGE
+	//freopen("input.txt", "r", stdin);
+	//freopen("output.txt", "w", stdout);
+#else
+#endif
+	ios_base::sync_with_stdio(0);
+	cin.tie(0); cout.tie(0);
+
+	point p; seg a;
+	cin >> p.x >> p.y >> a.start.x >> a.start.y >> a.end.x >> a.end.y;
+	bool ok = is_in_seg(p, a);
+	cout << (ok ? "YES" : "NO");
+
+	return 0;
+}
