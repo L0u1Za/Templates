@@ -48,6 +48,19 @@ struct point {
 
 const point pt_base = { 0.0, 0.0 };
 
+point operator+(point a, point b) {
+	return { a.x + b.x, a.y + b.y };
+}
+point operator-(point a, point b) {
+	return { a.x - b.x, a.y - b.y };
+}
+ld operator*(point a, point b) {
+	return a.x * b.y - a.y * b.x;
+}
+ld operator^(point a, point b) {
+	return a.x * b.x + a.y * b.y;
+}
+
 ld len(point a) {
 	return a.x * a.x + a.y * a.y;
 }
@@ -63,19 +76,6 @@ struct seg {
 		this->start = start;
 	}
 };
-
-point operator+(point a, point b) {
-	return { a.x + b.x, a.y + b.y };
-}
-point operator-(point a, point b) {
-	return { a.x - b.x, a.y - b.y };
-}
-ld operator*(point a, point b) {
-	return a.x * b.y - a.y * b.x;
-}
-ld operator^(point a, point b) {
-	return a.x * b.x + a.y * b.y;
-}
 bool is_equal(ld a, ld b) {
 	return fabs(a - b) < eps;
 }
@@ -98,6 +98,12 @@ bool is_in_luch(point a, seg b) {
 	return is_equal((a - b.start) * (b.end - b.start), 0.0) && cmp_more(((b.end - b.start) ^ (a - b.start)), 0.0);
 }
 
+bool cw(point a, point b) {
+	return cmp_less(a * b, 0.0);
+}
+bool ccw(point a, point b) {
+	return cmp_more(a * b, 0.0);
+}
 
 signed main() {
 #ifndef ONLINE_JUDGE
@@ -108,7 +114,7 @@ signed main() {
 	ios_base::sync_with_stdio(0);
 	cin.tie(0); cout.tie(0);
 
-	
+
 
 	return 0;
 }
