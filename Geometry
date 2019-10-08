@@ -62,9 +62,9 @@ ld operator^(point a, point b) {
 }
 
 ld len(point a) {
-	return a.x * a.x + a.y * a.y;
+	return sqrt(a.x * a.x + a.y * a.y);
 }
-ld dist(point a, point b) {
+ld pt_dist(point a, point b) {
 	return len(a - b);
 }
 
@@ -105,6 +105,28 @@ bool ccw(point a, point b) {
 	return cmp_more(a * b, 0.0);
 }
 
+struct line {
+	ld a, b, c;
+	line(ld a = base, ld b = base, ld c = base) {
+		this->a = a;
+		this->b = b;
+		this->c = c;
+	}
+};
+
+ld pt_to_line_dist(point p, line l) {
+	return (l.a * p.x + l.b * p.y + l.c) / (sqrt(l.a * l.a + l.b * l.b));
+}
+point pt_to_line_projection(point p, line l) {
+	ld d = pt_to_line_dist(p, l);
+	point n = { l.a, l.b };
+	n.x *= d;
+	n.y *= d;
+	n.x /= sqrt(l.a * l.a + l.b * l.b);
+	n.y /= sqrt(l.a * l.a + l.b * l.b);
+	return (p - n);
+}
+
 signed main() {
 #ifndef ONLINE_JUDGE
 	//freopen("input.txt", "r", stdin);
@@ -114,7 +136,6 @@ signed main() {
 	ios_base::sync_with_stdio(0);
 	cin.tie(0); cout.tie(0);
 
-
-
+	
 	return 0;
 }
