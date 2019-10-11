@@ -146,7 +146,7 @@ point get_o(point a, point b, point c) {
 	line l1 = { v1.x, v1.y, -v1.x * x0 - v1.y * y0 };
 	line l2 = { v2.x, v2.y, -v2.x * x1 - v2.y * y1 };
 
-	point per = { -1e10, -1e10 };
+	point per = { -INF, -INF };
 
 	if (!is_equal((l1.a * l2.b - l2.a * l1.b), 0.0)) {
 		per = { (l2.c * l1.b - l1.c* l2.b) / (l1.a * l2.b - l2.a * l1.b), (l1.c * l2.a - l2.c * l1.a) / (l1.a * l2.b - l2.a * l1.b) };
