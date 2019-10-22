@@ -1,0 +1,191 @@
+//Задача B. Реки
+#pragma GCC optmize("Ofast,unroll-loops,fast-math,no-stack-protector")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,avx,avx2,mmx,abm,popcnt,tune=native")
+#define _CRT_SECURE_NO_WARNINGS
+#define pb push_back
+
+#include <iostream>
+#include <climits>
+#include <algorithm>
+#include <iomanip>
+#include <cmath>
+#include <vector>
+#include <map>
+#include <string>
+#include <stack>
+#include <set>
+#include <cstdio>
+#include <cctype>
+#include <queue>
+#include <bitset>
+#include <functional>
+#include <cassert>
+#include <unordered_map>
+
+using namespace std;
+
+#define int long long
+
+typedef long long ll;
+typedef unsigned long long ull;
+typedef pair<ll, ll> pll;
+typedef pair<int, int> pii;
+typedef long double ld;
+typedef double db;
+
+const ll N = 2e5 + 10;
+const ll INF = LLONG_MAX;
+
+struct node {
+	node *l, *r;
+	int x, y;
+	int sum;
+	int val;
+	node(int s) {
+		l = nullptr;
+		r = nullptr;
+		y = rand();
+		sum = s * s;
+		val = s;
+		x = 1;
+	}
+};
+
+int getx(node* v) {
+	if (v == nullptr) return 0;
+	return v->x;
+}
+
+int getsum(node* v) {
+	if (v == nullptr) return 0;
+	return v->sum;
+}
+int getval(node* v) {
+	if (v == nullptr) return 0;
+	return v->val;
+}
+
+void add_val(node*& v, int newv) {
+	if (v == nullptr) return;
+	v->val += newv;
+	v->sum = getval(v) * getval(v);
+	v->sum += getsum(v->l) + getsum(v->r);
+}
+
+
+void change_val(node*& v, int newv) {
+	if (v == nullptr) return;
+	v->val = newv;
+	v->sum = newv * newv;
+	v->sum += getsum(v->l) + getsum(v->r);
+}
+
+void upd(node* v) {
+	if (v == nullptr) return;
+	v->sum = getsum(v->l) + getsum(v->r) + getval(v) * getval(v);
+	v->x = getx(v->l) + getx(v->r) + 1;
+}
+
+pair<node*, node*> split(node* root, int key) {
+	if (root == nullptr) {
+		return { nullptr, nullptr };
+	}
+	if (getx(root->l) < key) {
+		auto splitted = split(root->r, key - getx(root->l) - 1);
+		root->r = splitted.first;
+		upd(root);
+		return { root, splitted.second };
+	}
+	else {
+		auto splitted = split(root->l, key);
+		root->l = splitted.second;
+		upd(root);
+		return { splitted.first, root };
+	}
+}
+
+node* merge(node* left, node* right) {
+	if (left == nullptr || right == nullptr) {
+		return right != nullptr ? right : left;
+	}
+	if (left->y > right->y) {
+		left->r = merge(left->r, right);
+		upd(left);
+		return left;
+	}
+	else {
+		right->l = merge(left, right->l);
+		upd(right);
+		return right;
+	}
+}
+
+
+void erase(node*& root, int key) {
+	auto splitted1 = split(root, key - 1);
+	int sz1 = getx(splitted1.first);
+	auto splitted2 = split(splitted1.second, key - sz1); // fir - [i]
+	auto splitted3 = split(splitted1.first, key - 2); // sec - [i - 1]
+	auto splitted4 = split(splitted2.second, key + 1 - (sz1 + 1)); // fir - [i + 1]
+	int val1 = getval(splitted2.first) / 2, val2 = getval(splitted2.first) - val1;
+	add_val(splitted3.second, val1);
+	add_val(splitted4.first, val2);
+	if (splitted3.second == nullptr) add_val(splitted4.first, val1);
+	else if (splitted4.first == nullptr) add_val(splitted3.second, val2);
+	root = merge(merge(splitted3.first, splitted3.second), merge(splitted4.first, splitted4.second));
+}
+
+void cut(node*& root, int key) {
+	auto splitted1 = split(root, key - 1);
+	int sz1 = getx(splitted1.first);
+	auto splitted2 = split(splitted1.second, key - sz1); // fir - [i]
+	int val1 = getval(splitted2.first) / 2, val2 = getval(splitted2.first) - val1;
+	root = merge(merge(splitted1.first, new node(val1)), merge(new node(val2), splitted2.second));
+}
+
+void insert(node*& root, int key, int val) {
+	auto splitted = split(root, key - 1);
+	root = merge(merge(splitted.first, new node(val)), splitted.second);
+}
+
+
+signed main() {
+#ifndef ONLINE_JUDGE
+	//freopen("input.txt", "r", stdin);
+	//freopen("output.txt", "w", stdout);
+#else
+#endif
+	ios_base::sync_with_stdio(0);
+	cin.tie(0); cout.tie(0);
+
+	node *root = nullptr;
+
+	int n, p;
+	cin >> n >> p;
+	for (int i = 0; i < n; ++i) {
+		int x;
+		cin >> x;
+		insert(root, i + 1, x);
+	}
+	cout << getsum(root) << endl;
+	int m;
+	cin >> m;
+	while (m--) {
+		int type;
+		cin >> type;
+		if (type == 1) {
+			int id;
+			cin >> id;
+			erase(root, id);
+		}
+		else {
+			int id;
+			cin >> id;
+			cut(root, id);
+		}
+		cout << getsum(root) << endl;
+	}
+
+
+	return 0;
+}
