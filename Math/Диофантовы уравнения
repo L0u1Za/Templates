@@ -1,0 +1,111 @@
+#pragma GCC optmize("Ofast,unroll-loops,fast-math,no-stack-protector")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,avx,avx2,mmx,abm,popcnt,tune=native")
+#define _CRT_SECURE_NO_WARNINGS
+#define pb push_back
+
+#include <iostream>
+#include <climits>
+#include <algorithm>
+#include <iomanip>
+#include <cmath>
+#include <vector>
+#include <map>
+#include <string>
+#include <stack>
+#include <set>
+#include <cstdio>
+#include <cctype>
+#include <queue>
+#include <bitset>
+#include <functional>
+#include <cassert>
+#include <unordered_map>
+
+using namespace std;
+
+#define int long long
+
+typedef long long ll;
+typedef unsigned long long ull;
+typedef pair<ll, ll> pll;
+typedef pair<int, int> pii;
+typedef long double ld;
+typedef double db;
+
+const ll N = 2e5 + 10;
+const ll INF = LLONG_MAX;
+
+struct diaf {
+	int g;
+	int x, y;
+};
+
+diaf gcd(int a, int b) {
+	if (b == 0) {
+		return { a, 1, 0 };
+	}
+	int k = a / b;
+	diaf c = gcd(b, a - k * b);
+	int x = c.y;
+	int y = c.x - k * c.y;
+	return { c.g, x, y };
+}
+
+int gcd_simple(int a, int b) {
+	if (b == 0) return a;
+	return gcd_simple(b, a % b);
+}
+
+pii solve_diaf(int a, int b, int c) {
+	if (a < 0) {
+		a *= -1;
+		b *= -1;
+		c *= -1;
+	}
+	diaf d = gcd(a, b);
+	if (c % d.g) {
+		return { -INF, -INF };
+	}
+	int x = d.x * c / d.g;
+	int y = d.y * c / d.g;
+
+	return { x, y };
+}
+
+signed main() {
+#ifndef ONLINE_JUDGE
+	//freopen("input.txt", "r", stdin);
+	//freopen("output.txt", "w", stdout);
+#else
+#endif
+	ios_base::sync_with_stdio(0);
+	cin.tie(0); cout.tie(0);
+
+	int a, b, c;
+	cin >> a >> b >> c;
+	pair<int, int> ans = solve_diaf(a, b, c);
+	if (ans.first == -INF) {
+		cout << "Impossible";
+	}
+	else {
+		int x = ans.first;
+		int y = ans.second;
+		int g = gcd_simple(a, b);
+		b /= g;
+		a /= g;
+		if (x < 0) {
+			int k = (abs(x) + b - 1) / b;
+			x = x + k * b;
+			y = y - k * a;
+		}
+		else {
+			int k = x / b;
+			x = x - k * b;
+			y = y + k * a;
+		}
+		cout << x << ' ' << y;
+	}
+	
+
+	return 0;
+}
