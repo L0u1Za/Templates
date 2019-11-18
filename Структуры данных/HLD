@@ -1,0 +1,160 @@
+#define _CRT_SECURE_NO_WARNINGS
+#define pb push_back
+
+#include <iostream>
+#include <climits>
+#include <algorithm>
+#include <iomanip>
+#include <cmath>
+#include <vector>
+#include <map>
+#include <string>
+#include <stack>
+#include <set>
+#include <cstdio>
+#include <cctype>
+#include <queue>
+#include <bitset>
+#include <functional>
+#include <cassert>
+#include <unordered_map>
+
+using namespace std;
+
+#define int long long
+
+typedef long long ll;
+typedef unsigned long long ull;
+typedef pair<ll, ll> pll;
+typedef pair<int, int> pii;
+typedef long double ld;
+typedef double db;
+
+const ll N = 2e5 + 20;
+const ll INF = LONG_MAX;
+
+
+vector<pii> g[N];
+int sz[N];
+int len[N];
+int pred[N];
+
+void make_hld(int v, int p) {
+	pred[v] = p;
+	sz[v] = 1;
+	int mx = -1;
+	int id = -1;
+	bool ok = 0;
+	for (int i = 0; i < g[v].size(); ++i) {
+		auto to = g[v][i];
+		if (to.first != p) {
+			ok = 1;
+			len[to.first] = to.second;
+			make_hld(to.first, v);
+			if (sz[to.first] > mx) {
+				id = i;
+				mx = sz[to.first];
+			}
+			sz[v] += sz[to.first];
+		}
+	}
+	if (ok)
+		swap(g[v][0], g[v][id]);
+}
+int tin[N], tout[N];
+vector<int> eul;
+int up[N];
+
+void dfs(int v, int p) {
+	if (up[v] == 0) up[v] = up[p];
+	eul.pb(v);
+	tin[v] = eul.size() - 1;
+	for (auto& to : g[v]) {
+		if (to.first != p) {
+			if (to != *g[v].begin()) up[to.first] = to.first;
+			dfs(to.first, v);
+		}
+	}
+	tout[v] = eul.size() - 1;
+}
+vector<int> t[4 * N];
+
+void build(int v, int tl, int tr) {
+	if (tl == tr) {
+		t[v] = { len[eul[tl]] };
+		return;
+	}
+	int tm = (tl + tr) / 2;
+	build(2 * v + 1, tl, tm);
+	build(2 * v + 2, tm + 1, tr);
+	merge(t[2 * v + 1].begin(), t[2 * v + 1].end(), t[2 * v + 2].begin(), t[2 * v + 2].end(), back_inserter(t[v]));
+}
+
+int query(int v, int tl, int tr, int l, int r, int x) {
+	if (l <= tl && tr <= r) {
+		return upper_bound(t[v].begin(), t[v].end(), x) - t[v].begin();
+	}
+	if (tr < l || r < tl) return 0;
+	int tm = (tl + tr) / 2;
+	int q1 = query(2 * v + 1, tl, tm, l, r, x);
+	int	q2 = query(2 * v + 2, tm + 1, tr, l, r, x);
+	return q1 + q2;
+}
+
+bool upper(int a, int b) {
+	return tin[a] <= tin[b] && tout[a] >= tout[b];
+}
+
+int lca(int& a, int& b, int x) {
+	int ans = 0;
+	while (!upper(up[a], b)) {
+		ans += query(0, 0, eul.size() - 1, tin[up[a]], tin[a], x);
+		a = pred[up[a]];
+	}
+	return ans;
+}
+
+int get(int a, int b, int x) {
+	int ans = 0;
+	ans += lca(a, b, x);
+	ans += lca(b, a, x);
+	if (!upper(a, b)) swap(a, b);
+	if (tin[a] + 1 <= tin[b])
+		ans += query(0, 0, eul.size() - 1, tin[a] + 1, tin[b], x);
+	return ans;
+}
+
+signed main() {
+#ifndef ONLINE_JUDGE
+	//freopen("input.txt", "r", stdin);
+#else
+
+#endif
+	ios_base::sync_with_stdio(0);
+	cin.tie(0); cout.tie(0);
+
+	int n, q;
+	cin >> n >> q;
+	for (int i = 0; i < n - 1; ++i) {
+		int a, b, x;
+		cin >> a >> b >> x;
+		g[a].pb({ b, x });
+		g[b].pb({ a, x });
+	}
+	for (int i = 1; i <= n; ++i) {
+		if (len[i] == 0) {
+			len[i] = INF;
+			up[i] = i;
+			make_hld(i, 0);
+			dfs(i, 0);
+		}
+	}
+	build(0, 0, eul.size() - 1);
+	while (q--) {
+		int a, b, x;
+		cin >> a >> b >> x;
+		cout << get(a, b, x) << endl;
+	}
+
+	return 0;
+}
