@@ -1,0 +1,91 @@
+#define _CRT_SECURE_NO_WARNINGS
+#define pb push_back
+
+#include <iostream>
+#include <climits>
+#include <algorithm>
+#include <iomanip>
+#include <cmath>
+#include <vector>
+#include <map>
+#include <string>
+#include <stack>
+#include <set>
+#include <cstdio>
+#include <cctype>
+#include <queue>
+#include <bitset>
+#include <functional>
+#include <cassert>
+#include <unordered_map>
+
+using namespace std;
+
+#define int long long
+
+typedef long long ll;
+typedef unsigned long long ull;
+typedef pair<ll, ll> pll;
+typedef pair<int, int> pii;
+typedef long double ld;
+typedef double db;
+
+const ll N = 2 * 3e6 + 20;
+const ll INF = INT_MAX;
+
+int p = 3571;
+int mod = 2147483647;
+
+struct hsh {
+	vector<int> vec;
+	vector<int> seg;
+	int n;
+	void add(int &a, int val) {
+		a = ((a * p % mod + val) % mod + mod) % mod;
+	}
+	int calc(int a, int b) {
+		return ((a % mod + b % mod) % mod + mod) % mod;
+	}
+	int mul(int a, int b) {
+		return (((a % mod) * (b % mod)) % mod + mod) % mod;
+	}
+
+	int pow(int a, int n) {
+		if (n == 0) return 1LL;
+		if (n & 1) {
+			int b = pow(a, n ^ 1) % mod;
+			return mul(a, b);
+		}
+		else {
+			int b = pow(a, n >> 1) % mod;
+			return mul(b, b);
+		}
+	}
+	hsh(vector<int> a) {
+		n = a.size();
+		vec = a;
+		seg.resize(a.size() + 1);
+		for (int i = 0; i < a.size(); ++i) {
+			seg[i + 1] = seg[i];
+			add(seg[i + 1], a[i]);
+		}
+	}
+	int seg_hash(int l, int r) {
+		return calc(seg[r], (-1) * seg[l - 1] * pow(p, r - l + 1));
+	}
+};
+
+
+
+signed main() {
+#ifndef ONLINE_JUDGE
+	//freopen("input.txt", "r", stdin);
+	//freopen("output.txt", "w", stdout);
+#else
+#endif
+	ios_base::sync_with_stdio(0);
+	cin.tie(0); cout.tie(0);
+
+	
+	return 0;
+}
