@@ -146,23 +146,6 @@ signed main() {
 		insert(root, i + 1, x);
 	}
 	cout << getsum(root) << endl;
-	int m;
-	cin >> m;
-	while (m--) {
-		int type;
-		cin >> type;
-		if (type == 1) {
-			int id;
-			cin >> id;
-			erase(root, id);
-		}
-		else {
-			int id;
-			cin >> id;
-			cut(root, id);
-		}
-		cout << getsum(root) << endl;
-	}
 
 
 	return 0;
