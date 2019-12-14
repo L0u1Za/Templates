@@ -121,28 +121,6 @@ node* merge(node* left, node* right) {
 }
 
 
-void erase(node*& root, int key) {
-	auto splitted1 = split(root, key - 1);
-	int sz1 = getx(splitted1.first);
-	auto splitted2 = split(splitted1.second, key - sz1); // fir - [i]
-	auto splitted3 = split(splitted1.first, key - 2); // sec - [i - 1]
-	auto splitted4 = split(splitted2.second, key + 1 - (sz1 + 1)); // fir - [i + 1]
-	int val1 = getval(splitted2.first) / 2, val2 = getval(splitted2.first) - val1;
-	add_val(splitted3.second, val1);
-	add_val(splitted4.first, val2);
-	if (splitted3.second == nullptr) add_val(splitted4.first, val1);
-	else if (splitted4.first == nullptr) add_val(splitted3.second, val2);
-	root = merge(merge(splitted3.first, splitted3.second), merge(splitted4.first, splitted4.second));
-}
-
-void cut(node*& root, int key) {
-	auto splitted1 = split(root, key - 1);
-	int sz1 = getx(splitted1.first);
-	auto splitted2 = split(splitted1.second, key - sz1); // fir - [i]
-	int val1 = getval(splitted2.first) / 2, val2 = getval(splitted2.first) - val1;
-	root = merge(merge(splitted1.first, new node(val1)), merge(new node(val2), splitted2.second));
-}
-
 void insert(node*& root, int key, int val) {
 	auto splitted = split(root, key - 1);
 	root = merge(merge(splitted.first, new node(val)), splitted.second);
