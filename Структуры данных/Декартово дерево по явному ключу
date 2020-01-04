@@ -1,0 +1,70 @@
+struct node {
+	int x, y, sz, tp;
+	node *l, *r;
+	node* p;
+	node(int x) {
+		this->x = x;
+		y = rand();
+		sz = 1;
+		l = r = p = nullptr;
+		tp = ans;
+	}
+};
+
+int get_x(node *root) {
+	if (root == nullptr) return 0;
+	return root->x;
+}
+int get_y(node *root) {
+	if (root == nullptr) return 0;
+	return root->y;
+}
+void update(node *root) {
+	if (root == nullptr) return;
+	if (root->l != nullptr) root->l->p = root;
+	if (root->r != nullptr) root->r->p = root;
+}
+pair<node*, node*> split(node *root, int key) {
+	if (root == nullptr) return { nullptr, nullptr };
+	if (get_x(root) < key) {
+		auto splitted = split(root->r, key);
+		root->r = splitted.first;
+		update(root);
+		return { root, splitted.second };
+	}
+	else {
+		auto splitted = split(root->l, key);
+		root->l = splitted.second;
+		update(root);
+		return { splitted.first, root };
+	}
+}
+node* merge(node* l, node* r) {
+	if (l == nullptr || r == nullptr) {
+		update(l);
+		update(r);
+		return l != nullptr ? l : r;
+	}
+	if (get_y(l) > get_y(r)) {
+		l->r = merge(l->r, r);
+		update(l);
+		update(r);
+		return l;
+	}
+	else {
+		r->l = merge(l, r->l);
+		update(l);
+		update(r);
+		return r;
+	}
+}
+
+void insert(node *&root, int key) {
+	auto spl = split(root, key);
+	root = merge(merge(spl.first, new node(key)), spl.second);
+}
+void erase(node *&root, int key) {
+	auto spl1 = split(root, key);
+	auto spl2 = split(spl1.second, key + 1);
+	root = merge(spl1.first, spl2.second);
+}
