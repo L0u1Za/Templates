@@ -1,0 +1,146 @@
+#define _CRT_SECURE_NO_WARNINGS
+#define pb push_back
+
+#include <iostream>
+#include <climits>
+#include <algorithm>
+#include <iomanip>
+#include <cmath>
+#include <vector>
+#include <map>
+#include <string>
+#include <stack>
+#include <set>
+#include <cstdio>
+#include <cctype>
+#include <queue>
+#include <bitset>
+#include <functional>
+#include <cassert>
+#include <unordered_map>
+#include <unordered_set>
+
+using namespace std;
+
+//#define int long long
+
+typedef long long ll;
+typedef unsigned long long ull;
+typedef pair<ll, ll> pll;
+typedef pair<int, int> pii;
+typedef long double ld;
+typedef double db;
+
+const ll N = 2e5 + 5;
+const ll INF = 1e18;
+
+struct node {
+	node *l, *r;
+	int x, y;
+	int sz;
+	//int func;
+	node(int val) {
+		x = val;
+		y = rand();
+		sz = 1;
+		l = r = nullptr;
+		//func = start...;
+	}
+};
+
+node *root = nullptr;
+
+int get_x(node *r) {
+	return r == nullptr ? 0 : r->x;
+}
+int get_y(node *r) {
+	return r == nullptr ? 0 : r->y;
+}
+int get_sz(node *r) {
+	return r == nullptr ? 0 : r->sz;
+}
+
+void update(node* root) {
+	// change func;
+	root->sz = get_sz(root->l) + get_sz(root->r) + 1;
+}
+pair<node*, node*> split(node* root, int key) {
+	if (root == nullptr) return { nullptr, nullptr };
+	if (get_x(root) < key) {
+		auto spl = split(root->r, key);
+		root->r = spl.first;
+		update(root);
+		return { root, spl.second };
+	}
+	else {
+		auto spl = split(root->l, key);
+		root->l = spl.second;
+		update(root);
+		return { spl.first, root };
+	}
+}
+node* merge(node* left, node* right) {
+	if (left == nullptr || right == nullptr) return left == nullptr ? right : left;
+	if (get_y(left) > get_y(right)) {
+		left->r = merge(left->r, right);
+		update(left);
+		return left;
+	}
+	else {
+		right->l = merge(left, right->l);
+		update(right);
+		return right;
+	}
+}
+
+void insert(node*& root, int key) {
+	auto spl = split(root, key);
+	root = merge(merge(spl.first, new node(key)), spl.second);
+}
+void erase(node*& root, int key) {
+	auto spl1 = split(root, key);
+	auto spl2 = split(spl1.second, key + 1);
+	root = merge(spl1.first, spl2.second);
+}
+node* find_nth(node* root, int n) {
+	int sz = get_sz(root->l) + 1;
+	if (sz == n) {
+		return root;
+	}
+	else if (n < sz) {
+		return find_nth(root->l, n);
+	}
+	else if (n > sz) {
+		return find_nth(root->r, n - sz);
+	}
+}
+
+signed main() {
+#ifndef ONLINE_JUDGE
+	//freopen("input.txt", "r", stdin);
+	//freopen("output.txt", "w", stdout);
+#else
+#endif
+	ios_base::sync_with_stdio(0);
+	cin.tie(0); cout.tie(0);
+
+	int n;
+	cin >> n;
+	while (n--) {
+		int t;
+		cin >> t;
+		int x;
+		cin >> x;
+		if (t == 1) {
+			insert(root, x);
+		}
+		else if (t == 0) {
+			cout << get_x(find_nth(root, x)) << endl;
+		}
+		else {
+			erase(root, x);
+		}
+	}
+
+	return 0;
+}
